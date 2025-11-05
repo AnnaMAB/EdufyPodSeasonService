@@ -1,80 +1,65 @@
-package org.example.edufypodproducerservice.controller;
+package org.example.edufypodseasonservice.controller;
 
+import org.example.edufypodseasonservice.dto.SeasonDto;
+import org.example.edufypodseasonservice.entities.Season;
+import org.example.edufypodseasonservice.services.SeasonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
 @RestController
 @RequestMapping("/podcasts")
-public class ProducerController {
+public class SeasonController {
 
-    private final PodcastServiceImpl podcastService;
-    private final EpisodeServiceImpl episodeService;
-    private final GenreServiceImpl genreService;
+    private final SeasonService seasonService;
 
     @Autowired
-    public ProducerController(PodcastServiceImpl podcastService, EpisodeServiceImpl episodeService, GenreServiceImpl genreService) {
-        this.podcastService = podcastService;
-        this.episodeService = episodeService;
-        this.genreService = genreService;
+    public SeasonController(SeasonService seasonService) {
+        this.seasonService = seasonService;
     }
 
-
-
-    @PostMapping("/addpodcast")
-    public ResponseEntity<Podcast> addPodcast(@RequestBody PodcastDto podcastDto) {
-        return ResponseEntity.ok(podcastService.addPodcast(podcastDto));
+    @GetMapping("/season")
+    public ResponseEntity<SeasonDto> getSeason(UUID seasonId) {
+        return ResponseEntity.ok(seasonService.getSeason(seasonId));
     }
 
-
-    @PutMapping("/updatepodcast")
-    public ResponseEntity<Podcast> updatePodcast(@RequestBody PodcastDto podcastDto) {
-        return ResponseEntity.ok(podcastService.updatePodcast(podcastDto));
+    @GetMapping("/allseasons")
+    public ResponseEntity<List<SeasonDto>> getAllSeasons() {
+        return ResponseEntity.ok(seasonService.getAllSeasons());
     }
 
-
-    @DeleteMapping("/deletepodcast/{id}")
-    public ResponseEntity<String> deletePodcast(@PathVariable UUID id) {
-        return ResponseEntity.ok(podcastService.deletePodcast(id));
+    @GetMapping("/allseasonsbypodcast/{podcastId}")
+    public ResponseEntity<List<SeasonDto>> getAllSeasonsByPodcast(@PathVariable UUID podcastId) {
+        return ResponseEntity.ok(seasonService.getSeasonsByPodcast(podcastId));
     }
 
-
-    @PostMapping("/addepisode")
-    public ResponseEntity<Episode> addEpisode(@RequestBody EpisodeDto episodeDto) {
-        return ResponseEntity.ok(episodeService.addEpisode(episodeDto));
+    @GetMapping("/firstseasonsbypodcast/{podcastId}")
+    public ResponseEntity<SeasonDto> getFirstSeasonsByPodcast(@PathVariable UUID podcastId) {
+        return ResponseEntity.ok(seasonService.getFirstSeason(podcastId));
     }
 
-
-    @PutMapping("/updateepisode")
-    public ResponseEntity<Episode> updateEpisode(@RequestBody EpisodeDto episodeDto) {
-        return ResponseEntity.ok(episodeService.updateEpisode(episodeDto));
+    @GetMapping("/latestseasonsbypodcast/{podcastId}")
+    public ResponseEntity<SeasonDto> getLatestSeasonsByPodcast(@PathVariable UUID podcastId) {
+        return ResponseEntity.ok(seasonService.getLatestSeason(podcastId));
     }
 
-
-    @DeleteMapping("/deleteepisode/{id}")
-    public ResponseEntity<String> deleteEpisode(@PathVariable UUID id) {
-        return ResponseEntity.ok(episodeService.deleteEpisode(id));
+    @PostMapping("/addseason")
+    public ResponseEntity<Season> addSeason(@RequestBody SeasonDto seasonDto) {
+        return ResponseEntity.ok(seasonService.addSeason(seasonDto));
     }
 
-
-    @PostMapping("/addgenre")
-    public ResponseEntity<Genre> addGenre(@RequestBody GenreDto genreDto) {
-        return ResponseEntity.ok(genreService.addGenre(genreDto));
+    @PutMapping("/updateseason")
+    public ResponseEntity<Season> updateSeason(@RequestBody SeasonDto seasonDto) {
+        return ResponseEntity.ok(seasonService.updateSeason(seasonDto));
     }
 
-
-    @PutMapping("/updategenre")
-    public ResponseEntity<Genre> updateGenre(@RequestBody GenreDto genreDto) {
-        return ResponseEntity.ok(genreService.updateGenre(genreDto));
-    }
-
-
-    @DeleteMapping("/deletegenre/{id}")
-    public ResponseEntity<String> deleteGenre(@PathVariable UUID id) {
-        return ResponseEntity.ok(genreService.deleteGenre(id));
+    @DeleteMapping("/deleteseason/{seasonId}")
+    public ResponseEntity<String> deleteSeason(@PathVariable UUID seasonId) {
+        return ResponseEntity.ok(seasonService.deleteSeason(seasonId));
     }
 
 }

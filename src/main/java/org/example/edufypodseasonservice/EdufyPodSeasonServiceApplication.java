@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class EdufyPodSeasonServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EdufyPodSeasonServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(EdufyPodSeasonServiceApplication.class, args);
+    }
 
 }

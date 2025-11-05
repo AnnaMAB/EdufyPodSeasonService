@@ -1,13 +1,14 @@
-package org.example.edufypodcastservice.repositories;
+package org.example.edufypodseasonservice.repositories;
 
-import org.example.edufypodcastservice.entities.Episode;
+
+import org.example.edufypodseasonservice.entities.Season;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface EpisodeRepository extends JpaRepository<Episode, UUID> {
-    List<Episode> findAllByPodcast_Id(UUID podcastId);
+public interface SeasonRepository extends JpaRepository<Season, UUID> {
+
+
 }
