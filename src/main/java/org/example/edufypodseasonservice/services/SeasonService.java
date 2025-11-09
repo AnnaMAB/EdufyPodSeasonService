@@ -11,9 +11,10 @@ public interface SeasonService {
 
     SeasonDto getSeason(UUID seasonId);
     List<SeasonDto> getAllSeasons();
-    List<SeasonDto> getSeasonsByPodcast(UUID podcastId);
+    List<SeasonDto> getSeasonsByPodcast(UUID podcastId, boolean full);
     SeasonDto getFirstSeason(UUID podcastId);
     SeasonDto getLatestSeason(UUID podcastId);
+
     Season addSeason(SeasonDto seasonDto);
     Season updateSeason(SeasonDto seasonDto);
     String deleteSeason(UUID seasonId);

@@ -24,6 +24,7 @@ public class SeasonController {
 
     @GetMapping("/season")
     public ResponseEntity<SeasonDto> getSeason(UUID seasonId) {
+
         return ResponseEntity.ok(seasonService.getSeason(seasonId));
     }
 
@@ -32,9 +33,14 @@ public class SeasonController {
         return ResponseEntity.ok(seasonService.getAllSeasons());
     }
 
-    @GetMapping("/allseasonsbypodcast/{podcastId}")
-    public ResponseEntity<List<SeasonDto>> getAllSeasonsByPodcast(@PathVariable UUID podcastId) {
-        return ResponseEntity.ok(seasonService.getSeasonsByPodcast(podcastId));
+    @GetMapping("/allfullseasonsbypodcast/{podcastId}")
+    public ResponseEntity<List<SeasonDto>> getAllFullSeasonsByPodcast(@PathVariable UUID podcastId) {
+        return ResponseEntity.ok(seasonService.getSeasonsByPodcast(podcastId, true));
+    }
+
+    @GetMapping("/alllimitedseasonsbypodcast/{podcastId}")
+    public ResponseEntity<List<SeasonDto>> getAllLimitedSeasonsByPodcast(@PathVariable UUID podcastId) {
+        return ResponseEntity.ok(seasonService.getSeasonsByPodcast(podcastId, false));
     }
 
     @GetMapping("/firstseasonsbypodcast/{podcastId}")
