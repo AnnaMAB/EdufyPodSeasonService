@@ -12,7 +12,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/podcasts")
+@RequestMapping("/podcasts/seasons")
 public class SeasonController {
 
     private final SeasonService seasonService;
@@ -66,6 +66,26 @@ public class SeasonController {
     @DeleteMapping("/deleteseason/{seasonId}")
     public ResponseEntity<String> deleteSeason(@PathVariable UUID seasonId) {
         return ResponseEntity.ok(seasonService.deleteSeason(seasonId));
+    }
+
+    @PostMapping("/{seasonId}/addepisodes")
+    public ResponseEntity<SeasonDto> addEpisodesToSeason(@PathVariable UUID seasonId, @RequestBody List<UUID> episodeIds) {
+        return ResponseEntity.ok(seasonService.addEpisodesToSeason(seasonId, episodeIds));
+    }
+
+    @PostMapping("/{seasonId}/addepisodes/{episodeId}")
+    public ResponseEntity<SeasonDto> addOneEpisodeToSeason(@PathVariable UUID seasonId,@PathVariable UUID episodeId) {
+        return ResponseEntity.ok(seasonService.addOneEpisodeToSeason(seasonId, episodeId));
+    }
+
+    @DeleteMapping("/{seasonId}/removeepisodes/{episodeId}")
+    public ResponseEntity<SeasonDto> removeOneEpisodeFromSeason(@PathVariable UUID seasonId, @PathVariable UUID episodeId) {
+        return ResponseEntity.ok(seasonService.removeOneEpisodeFromSeason(seasonId, episodeId));
+    }
+
+    @DeleteMapping("/{seasonId}/removeepisodes")
+    public ResponseEntity<SeasonDto> removeEpisodesFromSeason(@PathVariable UUID seasonId, @RequestBody List<UUID> episodeIds) {
+        return ResponseEntity.ok(seasonService.removeEpisodesFromSeason(seasonId, episodeIds));
     }
 
 }

@@ -18,5 +18,9 @@ public interface SeasonService {
     Season addSeason(SeasonDto seasonDto);
     Season updateSeason(SeasonDto seasonDto);
     String deleteSeason(UUID seasonId);
+    SeasonDto addEpisodesToSeason(UUID seasonId, List<UUID> episodeIds);
+    SeasonDto addOneEpisodeToSeason(UUID seasonId, UUID episodeId);
+    SeasonDto removeEpisodesFromSeason(UUID seasonId, List<UUID> episodeIds);
+    SeasonDto removeOneEpisodeFromSeason(UUID seasonId, UUID episodeId);
 
 }

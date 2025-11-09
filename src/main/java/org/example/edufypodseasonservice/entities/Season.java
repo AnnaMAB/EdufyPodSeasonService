@@ -19,17 +19,20 @@ public class Season {
     private UUID id;
     @Column(length = 50, nullable = false)
     private String name;
-    @Column
+    @Column(nullable = false)
+    private UUID podcastId;
+    @Column(nullable = false)
     private Integer seasonNumber;
-    @Column(length = 500, nullable = false)
+    @Column(length = 500, nullable = true)
     private String description;
     @ElementCollection
     @CollectionTable(name = "season_episode_ids", joinColumns = @JoinColumn(name = "season_id"))
     @Column(name = "episode_id", columnDefinition = "char(36)")
     @JdbcTypeCode(SqlTypes.CHAR)
     private List<UUID> episodes = new ArrayList<>();
-    private UUID podcastId;
+    @Column(length = 500, nullable = true)
     private String thumbnailUrl;
+    @Column(length = 500, nullable = true)
     private String imageUrl;
 
 
