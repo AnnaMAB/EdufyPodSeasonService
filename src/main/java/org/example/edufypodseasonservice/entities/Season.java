@@ -19,7 +19,7 @@ public class Season {
     private UUID id;
     @Column(length = 50, nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column(name = "podcast_id", columnDefinition = "char(36)", nullable = false)
     private UUID podcastId;
     @Column(nullable = false)
     private Integer seasonNumber;
@@ -30,9 +30,9 @@ public class Season {
     @Column(name = "episode_id", columnDefinition = "char(36)")
     @JdbcTypeCode(SqlTypes.CHAR)
     private List<UUID> episodes = new ArrayList<>();
-    @Column(length = 500, nullable = true)
+    @Column(length = 500)
     private String thumbnailUrl;
-    @Column(length = 500, nullable = true)
+    @Column(length = 500)
     private String imageUrl;
 
 

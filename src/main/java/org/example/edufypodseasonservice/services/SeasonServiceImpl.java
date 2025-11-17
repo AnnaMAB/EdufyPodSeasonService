@@ -4,6 +4,7 @@ package org.example.edufypodseasonservice.services;
 import jakarta.transaction.Transactional;
 import org.example.edufypodseasonservice.dto.SeasonDto;
 import org.example.edufypodseasonservice.entities.Season;
+import org.example.edufypodseasonservice.external.EpisodeApiClient;
 import org.example.edufypodseasonservice.mapper.SeasonDtoConverter;
 import org.example.edufypodseasonservice.repositories.SeasonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,13 @@ public class SeasonServiceImpl implements SeasonService {
 
     private final SeasonRepository seasonRepository;
     private final SeasonDtoConverter seasonDtoConverter;
+    private final EpisodeApiClient episodeApiClient;
 
     @Autowired
-    public SeasonServiceImpl(SeasonRepository seasonRepository, SeasonDtoConverter seasonDtoConverter) {
+    public SeasonServiceImpl(SeasonRepository seasonRepository, SeasonDtoConverter seasonDtoConverter, EpisodeApiClient episodeApiClient) {
         this.seasonRepository = seasonRepository;
         this.seasonDtoConverter = seasonDtoConverter;
+        this.episodeApiClient = episodeApiClient;
     }
 
     @Override
@@ -204,14 +207,19 @@ public class SeasonServiceImpl implements SeasonService {
                     "Id must be provided"
             );
         }
-        if (!seasonRepository.existsById(seasonId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("No season exists with id: %s.", seasonId));
+        Season season = seasonRepository.findById(seasonId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("No season exists with ID: %s", seasonId)));
+        if (!season.getEpisodes().isEmpty()){
+            for (UUID episodeId : season.getEpisodes()) {
+                episodeApiClient.removeSeasonFromEpisode(episodeId, seasonId);
+            }
         }
         seasonRepository.deleteById(seasonId);
-        return String.format("Season with Id: %s have been successfully deleted.", seasonId);
+        return String.format("Season with Id: %s have been successfully deleted and episodes removed.", seasonId);
     }
 
+    @Transactional
     @Override
     public SeasonDto addEpisodesToSeason(UUID seasonId, List<UUID> episodeIds) {
         if (seasonId == null) {
@@ -228,14 +236,17 @@ public class SeasonServiceImpl implements SeasonService {
         for (UUID episodeId : episodeIds) {
             if (!currentEpisodes.contains(episodeId)) {
                 currentEpisodes.add(episodeId);
+                episodeApiClient.addSeasonToEpisode(episodeId, seasonId);
             }
         }
+
         season.setEpisodes(currentEpisodes);
         Season saved = seasonRepository.save(season);
 
         return seasonDtoConverter.seasonFullDtoConvert(saved);
     }
 
+    @Transactional
     @Override
     public SeasonDto addOneEpisodeToSeason(UUID seasonId, UUID episodeId) {
         if (seasonId == null) {
@@ -244,6 +255,10 @@ public class SeasonServiceImpl implements SeasonService {
         if (episodeId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Episode ID must be provided");
         }
+        if (!episodeApiClient.episodeExists(episodeId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Episode " + episodeId + " not found");
+        }
+
         Season season = seasonRepository.findById(seasonId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("No season exists with ID: %s", seasonId)));
@@ -254,11 +269,13 @@ public class SeasonServiceImpl implements SeasonService {
         }
         episodes.add(episodeId);
         season.setEpisodes(episodes);
+        episodeApiClient.addSeasonToEpisode(episodeId, seasonId);
         Season saved = seasonRepository.save(season);
 
         return seasonDtoConverter.seasonFullDtoConvert(saved);
     }
 
+    @Transactional
     @Override
     public SeasonDto removeEpisodesFromSeason(UUID seasonId, List<UUID> episodeIds) {
         if (seasonId == null) {
@@ -267,11 +284,17 @@ public class SeasonServiceImpl implements SeasonService {
         if (episodeIds == null || episodeIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one episode ID must be provided");
         }
+
         Season season = seasonRepository.findById(seasonId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("No season exists with ID: %s", seasonId)));
         List<UUID> currentEpisodes = season.getEpisodes();
-        currentEpisodes.removeAll(episodeIds);
+        for (UUID episodeId : episodeIds) {
+            if (currentEpisodes.contains(episodeId)) {
+                currentEpisodes.remove(episodeId);
+                episodeApiClient.removeSeasonFromEpisode(episodeId, seasonId);
+            }
+        }
         season.setEpisodes(currentEpisodes);
         Season saved = seasonRepository.save(season);
 
@@ -279,6 +302,7 @@ public class SeasonServiceImpl implements SeasonService {
     }
 
 
+    @Transactional
     @Override
     public SeasonDto removeOneEpisodeFromSeason(UUID seasonId, UUID episodeId) {
         if (seasonId == null) {
@@ -286,6 +310,9 @@ public class SeasonServiceImpl implements SeasonService {
         }
         if (episodeId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Episode ID must be provided");
+        }
+        if (!episodeApiClient.episodeExists(episodeId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Episode " + episodeId + " not found");
         }
         Season season = seasonRepository.findById(seasonId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -297,6 +324,7 @@ public class SeasonServiceImpl implements SeasonService {
         }
         episodes.remove(episodeId);
         season.setEpisodes(episodes);
+        episodeApiClient.removeSeasonFromEpisode(episodeId, seasonId);
         Season saved = seasonRepository.save(season);
 
         return seasonDtoConverter.seasonFullDtoConvert(saved);
