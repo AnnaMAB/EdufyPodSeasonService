@@ -2,6 +2,7 @@ package org.example.edufypodseasonservice.external;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -38,10 +39,15 @@ public class EpisodeApiClient {
 
     public void removeSeasonFromEpisode(UUID episodeId, UUID seasonId) {
         try {
-            restClient.post()
+            ResponseEntity<Void> response = restClient.put()
                     .uri(episodeRemoveApiUrl, seasonId, episodeId)
                     .retrieve()
                     .toBodilessEntity();
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new IllegalStateException(
+                        "Failed to remove episode " + episodeId + " from season " + seasonId +
+                                ". Status: " + response.getStatusCode());
+            }
         } catch (RestClientException e) {
             throw new IllegalStateException("Failed to remove episode " + episodeId + " from season " + seasonId, e);
         }
@@ -49,10 +55,15 @@ public class EpisodeApiClient {
 
     public void addSeasonToEpisode(UUID episodeId, UUID seasonId) {
         try {
-            restClient.post()
+            ResponseEntity<Void> response = restClient.put()
                     .uri(episodeAddApiUrl, seasonId, episodeId)
                     .retrieve()
                     .toBodilessEntity();
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new IllegalStateException(
+                        "Failed to add episode " + episodeId + " to season " + seasonId +
+                                ". Status: " + response.getStatusCode());
+            }
         } catch (RestClientException e) {
             throw new IllegalStateException("Failed to add episode " + episodeId + " to season " + seasonId, e);
         }
