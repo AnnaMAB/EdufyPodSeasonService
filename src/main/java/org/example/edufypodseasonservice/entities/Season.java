@@ -20,6 +20,7 @@ public class Season {
     @Column(length = 50, nullable = false)
     private String name;
     @Column(name = "podcast_id", columnDefinition = "char(36)", nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID podcastId;
     @Column(nullable = false)
     private Integer seasonNumber;

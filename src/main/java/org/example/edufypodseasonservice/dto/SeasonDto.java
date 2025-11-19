@@ -2,7 +2,6 @@ package org.example.edufypodseasonservice.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +13,7 @@ public class SeasonDto {
     private String name;
     private Integer seasonNumber;
     private String description;
-    private List<UUID> episodes = new ArrayList<>();
+    private List<UUID> episodes;
     private UUID podcastId;
     private String thumbnailUrl;
     private String imageUrl;

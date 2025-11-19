@@ -138,9 +138,13 @@ public class SeasonServiceImpl implements SeasonService {
         }
         if (seasonDto.getImageUrl() != null && !seasonDto.getImageUrl().isBlank()) {
             season.setImageUrl(seasonDto.getImageUrl());
+        }else {
+            season.setImageUrl("https://default/image.url");
         }
         if (seasonDto.getThumbnailUrl() != null && !seasonDto.getThumbnailUrl().isBlank()) {
             season.setThumbnailUrl(seasonDto.getThumbnailUrl());
+        }else {
+            season.setThumbnailUrl("https://default/thumbnail.url");
         }
         if (seasonDto.getEpisodes() != null && !seasonDto.getEpisodes().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Episodes can't be added from this endpoint");
@@ -284,7 +288,6 @@ public class SeasonServiceImpl implements SeasonService {
         if (episodeIds == null || episodeIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one episode ID must be provided");
         }
-
         Season season = seasonRepository.findById(seasonId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("No season exists with ID: %s", seasonId)));
@@ -292,6 +295,7 @@ public class SeasonServiceImpl implements SeasonService {
         for (UUID episodeId : episodeIds) {
             if (currentEpisodes.contains(episodeId)) {
                 currentEpisodes.remove(episodeId);
+                System.out.println(episodeId);
                 episodeApiClient.removeSeasonFromEpisode(episodeId, seasonId);
             }
         }

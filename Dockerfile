@@ -10,6 +10,6 @@ RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
-ENV SPRING_PROFILES_ACTIVE=prod
+ENV SPRING_PROFILES_ACTIVE=dev
 COPY --from=build /app/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
