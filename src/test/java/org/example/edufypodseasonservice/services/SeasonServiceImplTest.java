@@ -1,5 +1,6 @@
 package org.example.edufypodseasonservice.services;
 
+import org.example.edufypodseasonservice.converters.UserInfo;
 import org.example.edufypodseasonservice.dto.SeasonDto;
 import org.example.edufypodseasonservice.entities.Season;
 import org.example.edufypodseasonservice.external.EpisodeApiClient;
@@ -30,6 +31,9 @@ class SeasonServiceImplTest {
     @Mock
     private EpisodeApiClient episodeApiClientMock;
 
+    @Mock
+    private UserInfo userInfoMock;
+
     private final SeasonDtoConverter seasonDtoConverter = new SeasonDtoConverter();
 
     @InjectMocks
@@ -46,7 +50,7 @@ class SeasonServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        seasonService = new SeasonServiceImpl(seasonRepositoryMock, seasonDtoConverter, episodeApiClientMock);
+        seasonService = new SeasonServiceImpl(seasonRepositoryMock, seasonDtoConverter, episodeApiClientMock, userInfoMock);
 
         season = new Season();
         season.setId(seasonId);
@@ -155,7 +159,31 @@ class SeasonServiceImplTest {
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
         assertEquals("PodcastId must be provided", ex.getReason());
     }
-/*
+
+    @Test
+    void getFirstSeason_ShouldReturnFirstSeason() {
+        when(seasonRepositoryMock.findFirstByPodcastIdOrderBySeasonNumberAsc(podcastId)).thenReturn(Optional.of(season));
+
+        SeasonDto result = seasonService.getFirstSeason(podcastId);
+
+        assertEquals(season.getId(), result.getId());
+    }
+
+    @Test
+    void getFirstSeason_ShouldThrow_WhenPodcastIdNull() {
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> seasonService.getFirstSeason(null));
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+        assertEquals("PodcastId must be provided", ex.getReason());
+    }
+
+    @Test
+    void getFirstSeason_ShouldThrow_WhenNotFound() {
+        when(seasonRepositoryMock.findFirstByPodcastIdOrderBySeasonNumberAsc(podcastId)).thenReturn(Optional.empty());
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> seasonService.getFirstSeason(podcastId));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+        assertEquals("No season exists for podcastId: %s.", podcastId, ex.getReason());
+    }
+
     @Test
     void addSeason_ShouldSaveAndReturnSeason() {
         when(seasonRepositoryMock.existsByPodcastIdAndSeasonNumber(podcastId, 1)).thenReturn(false);
@@ -245,5 +273,5 @@ class SeasonServiceImplTest {
                 seasonService.removeOneEpisodeFromSeason(seasonId, episodeId));
         assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
         verify(seasonRepositoryMock, never()).save(any());
-    }*/
+    }
 }
