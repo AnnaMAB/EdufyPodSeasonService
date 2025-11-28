@@ -218,6 +218,13 @@ public class SeasonServiceImpl implements SeasonService {
             season.setSeasonNumber(seasonDto.getSeasonNumber());
         }
         if (seasonDto.getDescription() != null && !seasonDto.getDescription().equals(season.getDescription())) {
+            if(seasonDto.getDescription().isBlank()) {
+                F_LOG.warn("{} tried to update a season with invalid description.", role);
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Description can not be left blank."
+                );
+            }
             season.setDescription(seasonDto.getDescription());
         }
         if (seasonDto.getImageUrl() != null && !seasonDto.getImageUrl().equals(season.getImageUrl())) {
