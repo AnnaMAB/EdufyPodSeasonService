@@ -69,7 +69,7 @@ public class EpisodeApiClient {
             if (response.getStatusCode().is2xxSuccessful()) {
                 F_LOG.info("{} successfully removed season from episode.", role);
             } else {
-                F_LOG.warn("{}: Failed to removed season from episode. error: {}", role, response.getStatusCode());
+                F_LOG.warn("{}: Failed to remove season from episode. error: {}", role, response.getStatusCode());
                 throw new IllegalStateException(
                         response.getStatusCode().toString());
             }
@@ -83,19 +83,19 @@ public class EpisodeApiClient {
                 String message = json.path("message").asText();
                 String path = json.path("path").asText();
 
-                F_LOG.warn("{}: Failed to removed season from episode. error: {}", role, message);
+                F_LOG.warn("{}: Failed to remove season from episode. error: {}", role, message);
                 throw new IllegalStateException(
                         String.format("Failed to remove episode. Status %s, %s, Path:%s",
                                 status, message, path), e);
             } catch (IOException parseEx) {
-                F_LOG.warn("{}: Failed to removed season from episode. error: {}", role, parseEx.getMessage());
+                F_LOG.warn("{}: Failed to remove season from episode. error: {}", role, parseEx.getMessage());
                 throw new IllegalStateException("Failed to remove episode. Status=" + status + " body=" + body, e);
             }
         } catch (ResourceAccessException ex) {
-            F_LOG.warn("{}: Failed to removed season from episode. error: {}", role, ex.getMessage());
+            F_LOG.warn("{}: Failed to remove season from episode. error: {}", role, ex.getMessage());
             throw new IllegalStateException("Could not connect to episode service: " + ex.getMessage(), ex);
         } catch (RestClientException ex) {
-            F_LOG.warn("{}: Failed to removed season from episode. error: {}", role, ex.getMessage());
+            F_LOG.warn("{}: Failed to remove season from episode. error: {}", role, ex.getMessage());
             throw new IllegalStateException("Unexpected error calling episode service", ex);
         }
     }

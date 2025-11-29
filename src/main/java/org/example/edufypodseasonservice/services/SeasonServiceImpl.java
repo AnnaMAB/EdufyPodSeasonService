@@ -187,7 +187,7 @@ public class SeasonServiceImpl implements SeasonService {
     public Season updateSeason(SeasonDto seasonDto) {
         String role = userInfo.getRole();
         if(seasonDto.getId() == null) {
-            F_LOG.warn("{} tried to retrieve a season without providing an id.", role);
+            F_LOG.warn("{} tried to update a season without providing an id.", role);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "SeasonId is required");
         }
         Season season = seasonRepository.findById(seasonDto.getId()).orElseThrow(() -> {
@@ -220,9 +220,7 @@ public class SeasonServiceImpl implements SeasonService {
         if (seasonDto.getDescription() != null && !seasonDto.getDescription().equals(season.getDescription())) {
             if(seasonDto.getDescription().isBlank()) {
                 F_LOG.warn("{} tried to update a season with invalid description.", role);
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Description can not be left blank."
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description can not be left blank."
                 );
             }
             season.setDescription(seasonDto.getDescription());
@@ -238,7 +236,7 @@ public class SeasonServiceImpl implements SeasonService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Episodes can't be added from this endpoint");
         }
 
-        F_LOG.info("{} update a season with id {}.", userInfo.getRole(), season.getId());
+        F_LOG.info("{} updated a season with id {}.", userInfo.getRole(), season.getId());
         return seasonRepository.save(season);
     }
 
@@ -254,7 +252,7 @@ public class SeasonServiceImpl implements SeasonService {
             );
         }
         Season season = seasonRepository.findById(seasonId).orElseThrow(() -> {
-            F_LOG.warn("{} tried to retrieve a season with id {} that doesn't exist.", role, seasonId);
+            F_LOG.warn("{} tried to delete a season with id {} that doesn't exist.", role, seasonId);
             return new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     String.format("No season exists with id: %s.", seasonId)
@@ -286,8 +284,7 @@ public class SeasonServiceImpl implements SeasonService {
         Season season = seasonRepository.findById(seasonId).orElseThrow(() -> {
             F_LOG.warn("{} tried to retrieve a season with id {} that doesn't exist.", role, seasonId);
             return new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    String.format("No season exists with id: %s.", seasonId)
+                    HttpStatus.NOT_FOUND, String.format("No season exists with id: %s.", seasonId)
             );
         });
         List<UUID> currentEpisodes = season.getEpisodes();
