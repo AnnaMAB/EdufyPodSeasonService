@@ -157,8 +157,10 @@ public class SeasonServiceImpl implements SeasonService {
             F_LOG.warn("{} tried to add a season that already exist for that podcast.", userInfo.getRole());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Season with that number already exists");
         }
-        if (seasonDto.getDescription() != null || !seasonDto.getDescription().isBlank()) {
+        if (seasonDto.getDescription() != null) {
             season.setDescription(seasonDto.getDescription());
+        }else {
+            season.setDescription("");
         }
         if (seasonDto.getImageUrl() != null && !seasonDto.getImageUrl().isBlank()) {
             season.setImageUrl(seasonDto.getImageUrl());
@@ -178,8 +180,10 @@ public class SeasonServiceImpl implements SeasonService {
         season.setPodcastId(seasonDto.getPodcastId());
         season.setSeasonNumber(seasonDto.getSeasonNumber());
 
-        F_LOG.info("{} added a season with id {}.", userInfo.getRole(), season.getId());
-        return seasonRepository.save(season);
+        Season savedSeason = seasonRepository.save(season);
+
+        F_LOG.info("{} added a season with id {}.", userInfo.getRole(), savedSeason.getId());
+        return savedSeason;
     }
 
     @Transactional
@@ -208,7 +212,9 @@ public class SeasonServiceImpl implements SeasonService {
             season.setName(seasonDto.getName());
         }
         if (seasonDto.getPodcastId() != null && !seasonDto.getPodcastId().equals(season.getPodcastId())) {
-            season.setPodcastId(seasonDto.getPodcastId());
+            F_LOG.warn("{} tried to update a podcastId witch is not allowed.", role);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Update of podcastId not allowed."
+            );
         }
         if (seasonDto.getSeasonNumber() != null && !seasonDto.getSeasonNumber().equals(season.getSeasonNumber())) {
             if(seasonRepository.existsByPodcastIdAndSeasonNumber(season.getPodcastId(), seasonDto.getSeasonNumber())) {
@@ -265,7 +271,7 @@ public class SeasonServiceImpl implements SeasonService {
         }
         seasonRepository.deleteById(seasonId);
 
-        F_LOG.info("{} deleted season with id:", role, seasonId);
+        F_LOG.info("{} deleted season with id: {}", role, seasonId);
         return String.format("Season with Id: %s have been successfully deleted and episodes removed.", seasonId);
     }
 
@@ -299,7 +305,7 @@ public class SeasonServiceImpl implements SeasonService {
         Season saved = seasonRepository.save(season);
 
 
-        F_LOG.info("{} added episodes to season with {}.", role, seasonId);
+        F_LOG.info("{} added episodes to season with id {}.", role, seasonId);
         return seasonDtoConverter.seasonFullDtoConvert(saved);
     }
 
@@ -328,7 +334,7 @@ public class SeasonServiceImpl implements SeasonService {
         });
         List<UUID> episodes = season.getEpisodes();
         if (episodes.contains(episodeId)) {
-            F_LOG.warn("{} tried to add an episode that's already in the season", role);
+            F_LOG.warn("{} tried to add an episode that's already in the season.", role);
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format("Episode %s already exists in season %s", episodeId, seasonId));
         }
@@ -364,7 +370,6 @@ public class SeasonServiceImpl implements SeasonService {
         for (UUID episodeId : episodeIds) {
             if (currentEpisodes.contains(episodeId)) {
                 currentEpisodes.remove(episodeId);
-                System.out.println(episodeId);
                 episodeApiClient.removeSeasonFromEpisode(episodeId, seasonId);
             }
         }
