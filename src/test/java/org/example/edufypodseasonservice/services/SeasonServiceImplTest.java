@@ -314,7 +314,7 @@ class SeasonServiceImplTest {
     void addSeason_ShouldThrow_WhenSeasonNumberAlreadyExists() {
         when(seasonRepositoryMock.existsByPodcastIdAndSeasonNumber(seasonDto.getPodcastId(), seasonDto.getSeasonNumber())).thenReturn(true);
         ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> seasonService.addSeason(seasonDto));
-        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
         assertEquals("Season with that number already exists", ex.getReason());
         verify(seasonRepositoryMock, never()).save(any());
     }
@@ -448,7 +448,7 @@ class SeasonServiceImplTest {
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
                 () -> seasonService.updateSeason(seasonDto));
 
-        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
         assertEquals("Season with that number already exists", ex.getReason());
         verify(seasonRepositoryMock, never()).save(any());
     }

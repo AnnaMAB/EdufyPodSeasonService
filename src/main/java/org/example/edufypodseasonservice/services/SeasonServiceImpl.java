@@ -155,7 +155,7 @@ public class SeasonServiceImpl implements SeasonService {
         }
         if(seasonRepository.existsByPodcastIdAndSeasonNumber(seasonDto.getPodcastId(), seasonDto.getSeasonNumber())) {
             F_LOG.warn("{} tried to add a season that already exist for that podcast.", userInfo.getRole());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Season with that number already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Season with that number already exists");
         }
         if (seasonDto.getDescription() != null) {
             season.setDescription(seasonDto.getDescription());
@@ -219,7 +219,7 @@ public class SeasonServiceImpl implements SeasonService {
         if (seasonDto.getSeasonNumber() != null && !seasonDto.getSeasonNumber().equals(season.getSeasonNumber())) {
             if(seasonRepository.existsByPodcastIdAndSeasonNumber(season.getPodcastId(), seasonDto.getSeasonNumber())) {
                 F_LOG.warn("{} tried to change to a season number that already exist for that podcast.", userInfo.getRole());
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Season with that number already exists");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Season with that number already exists");
             }
             season.setSeasonNumber(seasonDto.getSeasonNumber());
         }
